@@ -1,0 +1,12 @@
+JESSPER ANDROID - para compilar en GitHub (sin Android Studio)
+
+ANTES DE SUBIR: copia TU carpeta web completa a app/src/main/assets/Jessper/ (sobrescribe).
+Faltaban panel.js, persist.js, sfz.js, panel.css y persist.css.
+
+1. Crea cuenta en github.com y un repositorio nuevo (privado esta bien).
+2. Add file > Upload files: arrastra TODO el contenido de esta carpeta (no el zip).
+   Debe verse la carpeta .github; si no se sube, crea el archivo a mano:
+   Add file > Create new file, nombre  .github/workflows/build.yml  y pega su contenido.
+3. Pestana Actions > "Compilar APK" > espera 5-10 min (circulo verde = listo).
+4. Entra a la ejecucion, abajo en Artifacts descarga "Jessper-APK" (zip con app-debug.apk).
+5. Pasa el APK al celular e instalalo (permite "instalar apps desconocidas").

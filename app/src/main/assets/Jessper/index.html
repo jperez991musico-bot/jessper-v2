@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16181c">
+<title>StageLoop</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="styles.css?v=13">
+<link rel="stylesheet" href="panel.css?v=13">
+<link rel="stylesheet" href="setlist.css?v=13">
+<link rel="stylesheet" href="persist.css?v=13">
+</head>
+<body>
+
+<header class="barra">
+  <button class="ico" id="btnMenu" title="Canciones">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+
+  <div class="cancionNav">
+    <button id="cPrev" title="Canción anterior">◀</button>
+    <div class="cancionTxt" id="cancionTxt" title="Ver canciones"><small id="cGenero">—</small><b id="cNombre">—</b></div>
+    <button id="cSig" title="Canción siguiente">▶</button>
+  </div>
+
+  <nav class="tabs">
+    <button data-vista="setlist">SET LIST</button>
+    <button data-vista="combis" class="activa">COMBIs</button>
+    <button data-vista="mixer">MIXER</button>
+  </nav>
+
+  <button class="ico tenue" id="btnGuardar" title="Guardar">
+    <svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5zM8 3v6h8V3M8 21v-7h8v7"/></svg>
+  </button>
+  <button class="ico" id="btnDeshacer" title="Deshacer">
+    <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
+  </button>
+
+  <div class="tran">
+    <button id="tranMenos">−</button>
+    <div><small>TRAN</small><b id="tranVal">0</b></div>
+    <button id="tranMas">+</button>
+  </div>
+
+  <div class="info">
+    <span class="infoMidi"><i id="ledMidi"></i>MIDI<em></em></span>
+    <span id="infoCarga">Voces 0</span>
+  </div>
+
+  <button class="ico" id="btnTeclado" title="Mostrar/ocultar teclado">
+    <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>
+  </button>
+  <button class="ico" id="btnStop" title="Detener">
+    <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" class="lleno"/></svg>
+  </button>
+  <button id="btnRec" class="rec">REC</button>
+  <button id="btnPanic" class="panic">PANIC</button>
+  <button class="ico" id="btnAjustes" title="Ajustes">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>
+  </button>
+  <button class="ico" id="btnFull" title="Pantalla completa">
+    <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+  </button>
+  <button class="ico" id="btnInfo" title="Acerca de">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>
+  </button>
+</header>
+
+<main>
+  <!-- ===== COMBIs ===== -->
+  <section id="vistaCombis" class="vista">
+    <div class="subbarra">
+      <label class="irCombi">Ir a la COMBI <input id="irCombi" type="number" min="1" value="1"></label>
+      <button id="btnPanelAbrir" title="Mostrar panel de patches">☰ Panel</button>
+      <button id="btnArrastre">Arrastrar: MOVER</button>
+    </div>
+
+    <div class="zonaGrid">
+      <div id="grid" class="grid"></div>
+    </div>
+
+    <aside id="panel" class="panel">
+      <div class="panelCab">
+        <span id="panelTitulo">Toca una celda para elegir la capa (CH)</span>
+        <button id="panelCerrar" class="cerrar">✕</button>
+      </div>
+
+      <nav class="ptabs">
+        <button data-ptab="patch" class="activa">PATCH</button>
+        <button data-ptab="param">PARÁMETROS</button>
+        <button data-ptab="trad">TRADUCTORES</button>
+      </nav>
+
+      <!-- PATCH -->
+      <div id="ptabPatch" class="ptab">
+        <div class="importar">
+          <span class="chip">◇ Samples</span>
+          <label class="btn">+ Carpeta<input type="file" id="inCarpeta" webkitdirectory multiple hidden></label>
+          <label class="btn">+ WAV<input type="file" id="inWav" accept="audio/*,.wav,.mp3" multiple hidden></label>
+          <label class="btn">+ SF2<input type="file" id="inSf2" accept=".sf2" hidden></label>
+          <!-- sfz.js agrega "+ SFZ" · wav.js agrega "+ Instrumento WAV" y "🎙 Auto-sampler" -->
+        </div>
+        <div class="filtros">
+          <input id="buscar" placeholder="Buscar patch...">
+          <select id="filtroLib"><option value="">Todas las librerías</option></select>
+        </div>
+        <div id="listaPatches" class="lista"></div>
+      </div>
+
+      <!-- PARÁMETROS -->
+      <div id="ptabParam" class="ptab oculto">
+        <div id="editorParams"></div>
+        <div id="editorCapa" class="oculto"></div>
+      </div>
+
+      <!-- TRADUCTORES -->
+      <div id="ptabTrad" class="ptab oculto">
+        <p class="tradAyuda">Convierte botones, pedales o knobs de tu teclado MIDI en acciones.
+          Pulsa <b>🎹 Learn</b> y mueve el control. Ej.: pedal CC 67 → COMBI siguiente.</p>
+        <div id="listaTrad"></div>
+        <button id="nuevoTrad" class="btnNuevo">+ Nuevo traductor</button>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ===== SET LIST (botones de COMBI, modo escenario) ===== -->
+  <section id="vistaSetlist" class="vista oculto">
+    <div id="tiles" class="tiles"></div>
+  </section>
+
+  <!-- ===== MIXER ===== -->
+  <section id="vistaMixer" class="vista oculto">
+    <div id="mixer" class="mixer"></div>
+  </section>
+</main>
+
+<!-- ===== Cajón de canciones (botón ☰) ===== -->
+<div id="cajonFondo" class="cajonFondo oculto"></div>
+<aside id="cajon" class="cajon oculto">
+  <div class="cajonCab">
+    <b>CANCIONES</b>
+    <button id="nuevaCancion">+ Canción</button>
+    <button id="cajonCerrar" class="cerrar">✕</button>
+  </div>
+  <div id="listaCanciones" class="lista grande"></div>
+</aside>
+
+<div id="mensaje" class="mensaje oculto">
+  <span id="mensajeTxt"></span>
+  <button id="mensajeCerrar">✕</button>
+</div>
+
+<footer id="piano" class="piano">
+  <div class="octava">
+    <button id="octMas" title="Subir octava">▲</button>
+    <span id="octTxt">C3</span>
+    <button id="octMenos" title="Bajar octava">▼</button>
+  </div>
+  <div id="teclado" class="teclado"></div>
+</footer>
+
+<dialog id="dlgAjustes">
+  <h3>Ajustes</h3>
+  <label>Release al soltar tecla: <span id="ajReleaseVal"></span>
+    <input id="ajRelease" type="range" min="0.02" max="2" step="0.01"></label>
+  <label>Nombres de notas
+    <select id="ajOctava">
+      <option value="1">C4 = 60 (científico)</option>
+      <option value="2">C3 = 60 (Yamaha)</option>
+    </select></label>
+  <p id="ajLat"></p>
+  <!-- latencia.js agrega ⚡ LATENCIA · persist.js agrega ALMACENAMIENTO -->
+  <button id="ajCerrar">Cerrar</button>
+</dialog>
+
+<script>
+  function mostrarError(txt) {
+    var m = document.getElementById('mensaje'), t = document.getElementById('mensajeTxt');
+    if (m && t) { t.textContent = '⚠️ ' + txt; m.classList.remove('oculto'); }
+  }
+  window.addEventListener('error', function (e) {
+    var archivo = e.filename ? e.filename.split('/').pop().split('?')[0] + ' ' : '';
+    mostrarError((e.message || 'Error') + ' (' + archivo + (e.lineno ? 'línea ' + e.lineno : '') + ')');
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    mostrarError(e.reason && e.reason.message ? e.reason.message : String(e.reason));
+  });
+  if (location.protocol === 'file:' && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.register = function () { return Promise.resolve(); };
+  }
+</script>
+
+<!-- El orden importa: latencia.js y audioBridge.js ANTES de app.js; los demás módulos DESPUÉS -->
+<script src="latencia.js?v=13" defer></script>
+<script src="audioBridge.js?v=13" defer></script>
+<script src="app.js?v=13" defer></script>
+<script src="panel.js?v=13" defer></script>
+<script src="setlist.js?v=13" defer></script>
+<script src="persist.js?v=13" defer></script>
+<script src="sfz.js?v=13" defer></script>
+<script src="wav.js?v=13" defer></script>
+</body>
+</html>

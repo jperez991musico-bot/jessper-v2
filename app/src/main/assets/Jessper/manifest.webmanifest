@@ -1,0 +1,16 @@
+{
+  "name": "StageLoop",
+  "short_name": "StageLoop",
+  "description": "Teclado de escenario con COMBIs, capas y samples",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#16181c",
+  "theme_color": "#16181c",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
